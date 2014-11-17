@@ -34,8 +34,6 @@ GLUquadricObj *quadric = gluNewQuadric();
 bool draw_intersection = false;
 bool draw_voronoi = false;
 
-tetrahedralizeio *in, *out, *vorout;
-
 void clear_intersection()
 {
     for(size_t i = 0; i < vor.edge_count(); i++) {
@@ -78,16 +76,6 @@ void intersection()
                 }
             }
         }
-    }
-}
-
-void dual_triangles()
-{
-    for(size_t i = 0; i < vor.edge_count(); i++) {
-        Edge* e = vor.get_edge(i);
-        Face* f = del.get_face(i);
-        e->dual = f;
-        f->dual = e;
     }
 }
 
@@ -290,7 +278,7 @@ void idle()
     glutPostRedisplay();
 }
 
-void convert()
+void convert(tetrahedralizeio* out, tetrahedralizeio* vorout)
 {
     for(size_t i = 0; i < vorout->numberofpoints; i++) {
         Vertex* v = new Vertex;
@@ -365,18 +353,21 @@ void convert()
         f->v.push_back(v);
         f->v.push_back(u);
         f->v.push_back(w);
+
+        Edge* e = vor.get_edge(i);
+        f->dual = e;
+        e->dual = f;
+
         del.add(f);
     }
     compute_normals(del);
-
-    dual_triangles();
 }
 
 void delaunay()
 {
-    in = new tetrahedralizeio;
-    out = new tetrahedralizeio;
-    vorout = new tetrahedralizeio;
+    tetrahedralizeio* in = new tetrahedralizeio;
+    tetrahedralizeio* out = new tetrahedralizeio;
+    tetrahedralizeio* vorout = new tetrahedralizeio;
     
     in->pointlist = new REAL[mesh.vertex_count()*3];
     in->pointattributelist = NULL;
@@ -402,7 +393,11 @@ void delaunay()
         in->pointlist[3*i+2] = v->v[2];
     }
     tetrahedralize("vzefQ", in, out, vorout);
-    convert();
+    convert(out, vorout);
+    
+    delete in;
+    delete out;
+    delete vorout;
 }
 
 void init()
