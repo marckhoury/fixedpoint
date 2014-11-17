@@ -201,6 +201,18 @@ void keyboard(unsigned char key, int x, int y)
     }
 }
 
+void menu()
+{
+    cout << "\033[1;31m   Fixed Point Menu\033[0m" << endl;
+    cout << "\033[1;31mOption                                    Key\033[0m" << endl;
+    cout << "Compute Intersections                      i" << endl;
+    cout << "Draw Intersections                         p" << endl;
+    cout << "Draw Voronoi Edges                         v" << endl;
+    cout << "Iterate RDT Operator                       n" << endl;
+    cout << "Toggle Wireframe                           w" << endl;
+    cout << "Quit                                       ESC" << endl;
+}
+
 void world_coords(int x, int y, double* p)
 {
     int viewport[4];
@@ -427,6 +439,7 @@ int main(int argc, char* argv[])
     glutInitWindowSize(ctx.width, ctx.height);
     glutCreateWindow("Del");
     init();
+    menu();
 
     mesh = read_obj(argv[1]);
     center_on_screen(mesh);
